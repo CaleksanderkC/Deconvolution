@@ -29,28 +29,39 @@ t_0 = repmat(t_0, 1, length(t(1,:)));
 % Napięcie maksymalne 
 V_ref = 50;
 
+
 %% Pojedynczy sygnał Testowy
-% V_real = filter_response(t, t_0, tau_sh, q, Cfeed);
-% V_real = add_white_noise(V_real, 0.1);
-% V_real = quantize_signal(V_real, V_ref, bit_res(12));
-% 
-% d = deconvolution(V_real, tau_sh, T_smp);
-% time=-3*T_smp:0.001:10*T_smp;
-% V_time=linspace(0,0,length(time));
-% i=time<t_0(1,1);
-% V_time(i)=0;
-% V_time(~i)=q/Cfeed*((time(~i)-t_0(1,1))/tau_sh).*exp(-(time(~i)-t_0(1,1))/tau_sh);
-% % V_time = add_white_noise(V_time, 0.1);
-% 
-% q_calc_quant = charge_output(d(:, 5:6), T_smp, tau_sh, Cfeed);
-% disp(mean(q_calc_quant(~isnan(q_calc_quant))) - q);
-% 
-% hold on
-% scatter(t(1,:),V_real(1,:));
-% plot(time, V_time)
-% stem([t(1,:), 0, 0], d(1,:));
-% hold off
-%% Liczymy zależność błędu od ilości bitów przetwornika ADC
+
+% Parametr 
+bit_res_test = 12;
+
+
+V_real = filter_response(t, t_0, tau_sh, q, Cfeed);
+V_real = add_white_noise(V_real, 0.1);
+V_real = quantize_signal(V_real, V_ref, bit_res_test);
+
+d = deconvolution(V_real, tau_sh, T_smp);
+time=-3*T_smp:0.001:10*T_smp;
+V_time=linspace(0,0,length(time));
+i=time<t_0(1,1);
+V_time(i)=0;
+V_time(~i)=q/Cfeed*((time(~i)-t_0(1,1))/tau_sh).*exp(-(time(~i)-t_0(1,1))/tau_sh);
+% V_time = add_white_noise(V_time, 0.1);
+
+q_calc_quant = charge_output(d(:, 5:6), T_smp, tau_sh, Cfeed);
+disp(mean(q_calc_quant(~isnan(q_calc_quant))) - q);
+
+figure(1);
+title('Example of asynchronous sampling with two non-zero filter output samples');
+hold on
+scatter(t(1,:),V_real(1,:));
+plot(time, V_time)
+stem([t(1,:), 0, 0], d(1,:));
+legend('Samples','FE pulse','Deconvolution')
+hold off
+
+
+% Liczymy zależność błędu od ilości bitów przetwornika ADC
 bit_res=4:16;
 err=zeros(1,length(bit_res));
 
@@ -73,6 +84,7 @@ for i=1:length(bit_res)
     q_calc_quant = q_calc_quant(~isnan(q_calc_quant));
 
     % q_calc_quant strzela do inf   trzeba poprawić funkcję
+
     % Na razie wstawiłem warunek który usuwa osobliwości
     q_calc_quant = q_calc_quant(abs(q_calc_quant)<V_ref);
 
@@ -80,6 +92,11 @@ for i=1:length(bit_res)
     err(i)=mean(abs(q_calc_quant-q));
     disp(mean(abs(q_calc_quant-q)));
 end
-
+figure(2);
+hold on
+title('Zależność błędu dekonwolucji od rozdzielczości bitowej.');
 semilogy(bit_res,err, "o");
+xlabel('Rozdzielczość bitowa');
+ylabel('Błąd');
 grid on;
+hold off

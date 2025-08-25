@@ -1,4 +1,4 @@
-function q = charge_output(d, T_smp, tau, Cfeed)
+function [q, t_0] = charge_output(d, T_smp, tau, Cfeed)
 
     % t_0 przewidywane z obliczeń     
     t_0=(d(:,2)./d(:,1)*T_smp)./(d(:,2)./d(:,1)+exp(-T_smp/tau));

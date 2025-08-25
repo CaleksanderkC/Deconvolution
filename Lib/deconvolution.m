@@ -10,7 +10,6 @@ function d = deconvolution(signal, tau_sh, T_smp)
     for i = 1 : length(signal(:, 1))
         w(i, :) = conv(signal(i, :), filter_coeffs);
     end
-    % disp(w)
     % Lepiej później określić największe prążki
     % d=w(:,5:6);
     d=w;

@@ -31,7 +31,6 @@ t_0 = repmat(t_0, 1, length(t(1,:)));
 
 % Napięcie maksymalne 
 V_ref = 50;
-
 White_noise_resio = 0.4;
 
 %% Pojedynczy sygnał Testowy
@@ -58,13 +57,13 @@ hold on;
 scatter(t(1,:),V_real(1,:));
 plot(time, V_time);
 stem([t(1,:), 0, 0], d(1,:));
-xlabel('bit_res');
-ylabel('t error [%]');
+xlabel('Time [au]');
+ylabel('Amplituda [au]');
 legend('Samples', 'FE pulse', 'Deconvolution');
 grid on;
 hold off;
 
-%% Liczymy zależność błędu od ilości bitów przetwornika ADC
+%% Zależność błędu obliczenia ładunku Q i startu sygnału t_0 od ilości bitów przetwornika ADC
 bit_res=4:16;
 q_err=zeros(1,length(bit_res));
 t_err=zeros(1,length(bit_res));
@@ -102,12 +101,55 @@ end
 
 figure;
 semilogy(bit_res,q_err, "o");
-xlabel('bit_res');
+xlabel('Rozdzielczość bitowa przetwornika ADC');
 ylabel('Q error [%]');
 grid on;
 
 figure;
 semilogy(bit_res,t_err, "o");
-xlabel('bit_res');
+xlabel('Rozdzielczość bitowa przetwornika ADC');
+ylabel('t error [%]');
+grid on;
+
+
+
+
+
+%% Zależność błędu obliczenia ładunku Q i startu sygnału t_0  zależności od szumu sygnału wyjściowego
+%Dla rozdielczości
+
+White_noise_resio_=0.0:0.1:0.6;
+q_err_noise=zeros(1,length(White_noise_resio_));
+t_err_noise=zeros(1,length(White_noise_resio_));
+
+for i = 1:length(White_noise_resio_)
+
+    V_real = filter_response(t, t_0, tau_sh, q, Cfeed);
+    V_real = add_white_noise(V_real, White_noise_resio_(i));
+    V_real = quantize_signal(V_real, V_ref, 12);
+
+    d = deconvolution(V_real, tau_sh, T_smp);
+    d=d(:,5:6);
+
+    [q_calc_quant, t_0_calc_quant] = charge_output(d, T_smp, tau_sh, Cfeed);
+    quant_index = ~isnan(q_calc_quant) & abs(q_calc_quant) <= V_ref & ~isnan(t_0_calc_quant) & abs(t_0_calc_quant) <= 1;
+
+    q_calc_quant = q_calc_quant(quant_index);
+    t_0_calc_quant = t_0_calc_quant(quant_index);
+
+    % Błąd względny 
+    q_err_noise(i)=mean( abs(q_calc_quant-q)/q );
+    t_err_noise(i)=mean( abs(t_0_calc_quant-t_0(quant_index,12))./t_0(quant_index,12) );
+end
+
+figure;
+semilogy(White_noise_resio_,q_err_noise, "o");
+xlabel('Intensywność szumu białego 𝞂');
+ylabel('Q error [%]');
+grid on;
+
+figure;
+semilogy(White_noise_resio_,t_err_noise, "o");
+xlabel('Intensywność szumu białego 𝞂');
 ylabel('t error [%]');
 grid on;

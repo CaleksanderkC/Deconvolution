@@ -1,4 +1,12 @@
 function V_quant = quantize_signal(signal, V_ref, bit_res)
+%   Funkcja syumuluję przejście sygnału przez przetwornik ADS
+% Wejście:
+%   signal    :  Sygnał wejściowy
+%   V_ref     :  Napięcie referencyjne
+%   bit_res   :  Rozdzielczość przetwornika ADS
+% Wyjście:
+%   V_quant   : sygnał po dekonwolucji
+
     V_lsb = V_ref/(2^bit_res-1);
     V_levels=0:V_lsb:(2^bit_res-1)*V_lsb;
     V_quant=zeros(size(signal));

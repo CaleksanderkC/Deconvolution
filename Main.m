@@ -6,7 +6,7 @@ addpath('Lib');
 
 N=10000;                 % Ilośc próbek
 q = 20;                  % Ładunek testowy
-Cfeed = 3;               % Wspólczynnik amplitudowy
+Cfeed = 3;               % Współczynnik amplitudowy
 V_ref = 50;              % Napięcie maksymalne 
 
 tau_sh = 1;              % Okres sygnału bezwymiarowy
@@ -42,7 +42,7 @@ V_time(~i)=q/Cfeed*((time(~i)-t_0(1,1))/tau_sh).*exp(-(time(~i)-t_0(1,1))/tau_sh
 % V_time = add_white_noise(V_time, 0.1);
 
 
-max_sampls = find_2_max(d, t, T_smp);
+max_sampls = d1_d2(d, t, T_smp);
 
 [q_calc_quant, t_calc] = charge_output(max_sampls, T_smp, tau_sh, Cfeed);
 disp(q_calc_quant)
@@ -77,7 +77,7 @@ for i=1:length(bit_res)
     d = deconvolution(V_real, tau_sh, T_smp);
 
     % Dwa największe prążki
-    max_sampls = find_2_max(d, t, T_smp);
+    max_sampls = d1_d2(d, t, T_smp);
 
     % Obliczamy ładunek i t_0 
     [q_calc_quant, t_0_calc_quant] = charge_output(max_sampls, T_smp, tau_sh, Cfeed);
@@ -123,7 +123,7 @@ for i = 1:length(White_noise_resio_)
 
     d = deconvolution(V_real, tau_sh, T_smp);
 
-    max_sampls = find_2_max(d, t, T_smp);
+    max_sampls = d1_d2(d, t, T_smp);
 
     [q_calc_quant, t_0_calc_quant] = charge_output(d, T_smp, tau_sh, Cfeed);
     quant_index = ~isnan(q_calc_quant) & abs(q_calc_quant) <= V_ref & ~isnan(t_0_calc_quant) & abs(t_0_calc_quant) <= 1;
@@ -176,7 +176,7 @@ for i = 1:length(smp_sh_ratio_samples)
 
     d = deconvolution(V_real, tau_sh, T_smp);
 
-    max_sampls = find_2_max(d, t, T_smp);
+    max_sampls = d1_d2(d, t, T_smp);
 
     [q_calc_quant, t_0_calc_quant] = charge_output(d, T_smp, tau_sh, Cfeed);
     quant_index = ~isnan(q_calc_quant) & abs(q_calc_quant) <= V_ref & ~isnan(t_0_calc_quant) & abs(t_0_calc_quant) <= 1;

@@ -1,4 +1,4 @@
-function max_sampls = find_2_max(d, t, T_smp)
+function max_sampls = d1_d2(d, t, T_smp)
 %FIND_2_MAX zwraca 2 największe przążki po dekonwolucji d1,d2
 % Wejście:
 %   d          :  Przążki po dekonwolucji

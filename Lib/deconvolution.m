@@ -18,7 +18,5 @@ function d = deconvolution(signal, tau_sh, T_smp)
         w(i, :) = conv(signal(i, :), filter_coeffs);
     end
 
-
-    % d=w(:,5:6);
     d=w;
 end
